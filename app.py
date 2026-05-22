@@ -14,11 +14,11 @@ except Exception:
     st.stop()
 
 MODELS = [
+    "deepseek/deepseek-v4-flash:free",
+    "google/gemma-4-31b-it:free",
+    "nvidia/nemotron-3-super-120b-a12b:free",
+    "openai/gpt-oss-120b:free",
     "meta-llama/llama-3.3-70b-instruct:free",
-    "mistralai/mistral-small-3.1-24b-instruct:free",
-    "qwen/qwen2.5-72b-instruct:free",
-    "google/gemini-2.0-flash-thinking-exp:free",
-    "microsoft/phi-4-reasoning-plus:free",
 ]
 
 def generate(prompt: str) -> str:
