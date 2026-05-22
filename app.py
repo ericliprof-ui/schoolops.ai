@@ -1,6 +1,5 @@
 import streamlit as st
 import requests
-model_choice = "deepseek/deepseek-r1:free"
 
 st.set_page_config(
     page_title="SchoolOps AI",
@@ -14,25 +13,34 @@ except Exception:
     st.error("API key not found. Add OPENROUTER_API_KEY to your Streamlit secrets.")
     st.stop()
 
+MODELS = [
+    "meta-llama/llama-3.3-70b-instruct:free",
+    "mistralai/mistral-small-3.1-24b-instruct:free",
+    "qwen/qwen2.5-72b-instruct:free",
+    "google/gemini-2.0-flash-thinking-exp:free",
+    "microsoft/phi-4-reasoning-plus:free",
+]
+
 def generate(prompt: str) -> str:
-    try:
-        response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "Content-Type": "application/json"
-            },
-            json={
-                "model": model_choice,
-                "messages": [{"role": "user", "content": prompt}]
-            }
-        )
-        data = response.json()
-        if "choices" not in data:
-            return f"API error: {data}"
-        return data["choices"][0]["message"]["content"]
-    except Exception as e:
-        return f"Something went wrong: {e}"
+    for model in MODELS:
+        try:
+            response = requests.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": model,
+                    "messages": [{"role": "user", "content": prompt}]
+                }
+            )
+            data = response.json()
+            if "choices" in data:
+                return data["choices"][0]["message"]["content"]
+        except Exception:
+            continue
+    return "All models are currently unavailable. Please try again in a few minutes."
 
 st.sidebar.title("SchoolOps AI")
 st.sidebar.caption("Free AI tools for educators")
