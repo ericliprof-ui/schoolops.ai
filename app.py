@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+model_choice = "deepseek/deepseek-r1:free"
 
 st.set_page_config(
     page_title="SchoolOps AI",
@@ -22,7 +23,7 @@ def generate(prompt: str) -> str:
                 "Content-Type": "application/json"
             },
             json={
-                "model": "meta-llama/llama-3.3-70b-instruct:free",
+                "model": model_choice,
                 "messages": [{"role": "user", "content": prompt}]
             }
         )
