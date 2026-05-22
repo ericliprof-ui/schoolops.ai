@@ -1,33 +1,35 @@
 import streamlit as st
-import google.generativeai as genai
+import requests
 
-# --- Page config ---
 st.set_page_config(
     page_title="SchoolOps AI",
     page_icon="🏫",
     layout="centered"
 )
 
-# --- API Key setup ---
-# Locally: create a file .streamlit/secrets.toml with: GEMINI_API_KEY = "your_key_here"
-# On Streamlit Cloud: add GEMINI_API_KEY in the Secrets section of your app dashboard
 try:
-    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
 except Exception:
-    st.error("API key not found. Add GEMINI_API_KEY to your Streamlit secrets.")
+    st.error("API key not found. Add OPENROUTER_API_KEY to your Streamlit secrets.")
     st.stop()
 
-model = genai.GenerativeModel("gemini-1.5-flash")
-
-# --- Helper ---
 def generate(prompt: str) -> str:
     try:
-        response = model.generate_content(prompt)
-        return response.text
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "google/gemini-2.0-flash-exp:free",
+                "messages": [{"role": "user", "content": prompt}]
+            }
+        )
+        return response.json()["choices"][0]["message"]["content"]
     except Exception as e:
         return f"Something went wrong: {e}"
 
-# --- Sidebar nav ---
 st.sidebar.title("SchoolOps AI")
 st.sidebar.caption("Free AI tools for educators")
 tool = st.sidebar.radio(
@@ -37,12 +39,9 @@ tool = st.sidebar.radio(
 )
 st.sidebar.markdown("---")
 st.sidebar.markdown("Built by a student. 100% free.")
-feedback_url = "https://forms.gle/your-form-link-here"  # Replace with your Google Form link
+feedback_url = "https://forms.gle/your-form-link-here"
 st.sidebar.markdown(f"[Give feedback]({feedback_url})")
 
-# ──────────────────────────────────────────
-# TOOL 1: Parent Email Generator
-# ──────────────────────────────────────────
 if tool == "Parent Email Generator":
     st.title("Parent Email Generator")
     st.caption("Generate professional parent emails in seconds.")
@@ -89,9 +88,6 @@ Do not add any preamble or explanation — just the email itself."""
         st.text_area("", value=result, height=300, label_visibility="collapsed")
         st.caption("Copy the text above and paste it into your email client.")
 
-# ──────────────────────────────────────────
-# TOOL 2: Staff Announcement Writer
-# ──────────────────────────────────────────
 elif tool == "Staff Announcement Writer":
     st.title("Staff Announcement Writer")
     st.caption("Turn bullet points into a clean, professional announcement.")
@@ -139,9 +135,6 @@ Do not add any preamble — just the announcement itself."""
             st.text_area("", value=result, height=300, label_visibility="collapsed")
             st.caption("Copy the text above to use in your email or bulletin.")
 
-# ──────────────────────────────────────────
-# TOOL 3: Meeting Notes Summarizer
-# ──────────────────────────────────────────
 elif tool == "Meeting Notes Summarizer":
     st.title("Meeting Notes Summarizer")
     st.caption("Paste raw meeting notes and get a clean structured summary.")
