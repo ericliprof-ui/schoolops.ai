@@ -1,11 +1,18 @@
 import streamlit as st
 import requests
+from datetime import date
 
-st.set_page_config(
-    page_title="SchoolOps AI",
-    page_icon="🏫",
-    layout="centered"
-)
+TODAY = date.today().strftime("%B %d, %Y")
+
+def copy_button(text):
+    escaped = text.replace("`", "\\`").replace("\\", "\\\\")
+    st.components.v1.html(f"""
+        <button onclick="navigator.clipboard.writeText(`{escaped}`)"
+            style="background:none;border:1px solid #ccc;padding:6px 14px;
+            border-radius:6px;cursor:pointer;font-size:14px;">
+            Copy to clipboard
+        </button>
+    """, height=45)
 
 try:
     OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
@@ -82,6 +89,7 @@ if tool == "Parent Email Generator":
     if st.button("Generate email", type="primary"):
         with st.spinner("Writing..."):
             prompt = f"""You are an experienced school administrator helping a teacher write a professional parent email.
+Today's date is {TODAY}.
 
 Situation: {situation}
 Tone: {tone}
@@ -100,7 +108,8 @@ Do not add any preamble or explanation — just the email itself."""
         st.markdown("---")
         st.subheader("Your email")
         st.text_area("", value=result, height=300, label_visibility="collapsed")
-        st.caption("Copy the text above and paste it into your email client.")
+        copy_button(result)
+        st.caption("Paste into your email client.")
 
 elif tool == "Staff Announcement Writer":
     st.title("Staff Announcement Writer")
@@ -129,6 +138,7 @@ elif tool == "Staff Announcement Writer":
         else:
             with st.spinner("Writing..."):
                 prompt = f"""You are a school principal writing a staff announcement.
+Today's date is {TODAY}.
 
 Type: {announcement_type}
 Audience: {audience if audience else "All staff"}
@@ -147,7 +157,8 @@ Do not add any preamble — just the announcement itself."""
             st.markdown("---")
             st.subheader("Your announcement")
             st.text_area("", value=result, height=300, label_visibility="collapsed")
-            st.caption("Copy the text above to use in your email or bulletin.")
+            copy_button(result)
+            st.caption("Paste into your email or bulletin.")
 
 elif tool == "Meeting Notes Summarizer":
     st.title("Meeting Notes Summarizer")
@@ -174,6 +185,7 @@ elif tool == "Meeting Notes Summarizer":
                     sections.append("- Key decisions made")
 
                 prompt = f"""You are an assistant helping a school administrator clean up meeting notes.
+Today's date is {TODAY}.
 
 Raw notes:
 {raw_notes}
@@ -191,4 +203,5 @@ Do not add any preamble — just the summary itself."""
             st.markdown("---")
             st.subheader("Your summary")
             st.text_area("", value=result, height=350, label_visibility="collapsed")
-            st.caption("Copy and paste into your meeting record or send to attendees.")
+            copy_button(result)
+            st.caption("Paste into your meeting record or send to attendees.")
