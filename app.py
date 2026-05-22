@@ -22,7 +22,7 @@ def generate(prompt: str) -> str:
                 "Content-Type": "application/json"
             },
             json={
-                "model": "openrouter/auto",
+                "model": "meta-llama/llama-3.3-70b-instruct:free",
                 "messages": [{"role": "user", "content": prompt}]
             }
         )
