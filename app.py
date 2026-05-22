@@ -26,7 +26,10 @@ def generate(prompt: str) -> str:
                 "messages": [{"role": "user", "content": prompt}]
             }
         )
-        return response.json()["choices"][0]["message"]["content"]
+        data = response.json()
+        if "choices" not in data:
+            return f"API error: {data}"
+        return data["choices"][0]["message"]["content"]
     except Exception as e:
         return f"Something went wrong: {e}"
 
