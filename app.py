@@ -60,7 +60,7 @@ tool = st.sidebar.radio(
 )
 st.sidebar.markdown("---")
 st.sidebar.markdown("Built by a student. 100% free.")
-feedback_url = "https://forms.gle/your-form-link-here"
+feedback_url = "https://docs.google.com/forms/d/e/1FAIpQLSctqptTe4dddzVTcjFdw9cOlOCIoP7sIp6BHC4W-CQQd2SNWg/viewform?usp=publish-editor"
 st.sidebar.markdown(f"[Give feedback]({feedback_url})")
 
 if tool == "Parent Email Generator":
