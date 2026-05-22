@@ -22,6 +22,7 @@ MODELS = [
 ]
 
 def generate(prompt: str) -> str:
+    errors = []
     for model in MODELS:
         try:
             response = requests.post(
@@ -38,9 +39,10 @@ def generate(prompt: str) -> str:
             data = response.json()
             if "choices" in data:
                 return data["choices"][0]["message"]["content"]
-        except Exception:
-            continue
-    return "All models are currently unavailable. Please try again in a few minutes."
+            errors.append(f"{model}: {data.get('error', {}).get('message', str(data))}")
+        except Exception as e:
+            errors.append(f"{model}: {e}")
+    return "Errors:\n" + "\n".join(errors)
 
 st.sidebar.title("SchoolOps AI")
 st.sidebar.caption("Free AI tools for educators")
